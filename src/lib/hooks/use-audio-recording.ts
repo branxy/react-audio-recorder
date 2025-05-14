@@ -115,7 +115,11 @@ export const useAudioRecording = ({
           "Failed to stop recording at mediaRecorderRef.current.onstop: mediaRecorderRef is nullish"
         )
 
-      const file = new File(chunks, crypto.randomUUID(), {
+      const fileName = `${crypto.randomUUID()}.${
+        userAudioSetup.selectedExtension
+      }`
+
+      const file = new File(chunks, fileName, {
         type: userAudioSetup.selectedMIMEType,
       })
       chunks = []
