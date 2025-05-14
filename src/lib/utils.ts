@@ -115,3 +115,29 @@ export const getSupportedMIMEType = () => {
 
   return selectedMIMEType
 }
+
+export const getLocalStream = async () => {
+  if (!navigator?.mediaDevices?.getUserMedia)
+    throw new Error(
+      "Failed to get access to microphone: getUserMedia is not supported in your browser."
+    )
+
+  try {
+    const stream = await navigator.mediaDevices.getUserMedia({
+      audio: true,
+    })
+    return stream
+  } catch (error) {
+    if (error instanceof Error) {
+      throw Error(
+        `Failed to get access to microphone at getLocalStream: ${error.message}`,
+        { cause: error }
+      )
+    } else {
+      console.error(error)
+      throw Error(
+        "Failed to get access to microphone at getLocalStream: unexpected error."
+      )
+    }
+  }
+}
