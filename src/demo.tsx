@@ -37,7 +37,7 @@ const Intro = ({
     <Button
       onClick={() => setStage("recording")}
       disabled={!userAudioSetup}
-      className="mt-8"
+      className="mt-12"
     >
       Start test
     </Button>
