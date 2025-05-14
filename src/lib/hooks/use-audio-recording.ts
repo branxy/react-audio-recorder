@@ -63,8 +63,9 @@ export const useAudioRecording = ({
   })
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const { isIdle, isRecording, isPlaying, isStopped } =
-    getAudioRecorderStatusBooleans(recorderState.status)
+  const { isIdle, isRecording, isPlaying } = getAudioRecorderStatusBooleans(
+    recorderState.status
+  )
 
   // Debug info:
   // useEffect(() => {
@@ -104,7 +105,7 @@ export const useAudioRecording = ({
       //   `mediaRecorderRef.current.onstop() at ${new Date().toLocaleTimeString()}`,
       // );
 
-      if (!userAudioSetup?.selectedMIMEType)
+      if (!userAudioSetup)
         throw Error(
           "Failed to call mediaRecorderRef.current.onstop: selectedMIMEType is undefined."
         )
@@ -125,6 +126,8 @@ export const useAudioRecording = ({
       audioElementRef.current = new Audio(newAudioURL)
       const audio = audioElementRef.current as HTMLAudioElement
       audio.onerror = (e) => console.error(e)
+
+      if (onRecordFinish) onRecordFinish(file)
     }
 
     mediaRecorderRef.current.onerror = (e) => {
@@ -133,7 +136,7 @@ export const useAudioRecording = ({
 
     mediaRecorderRef.current.start()
     setRecorderState({ status: "recording" })
-  }, [userAudioSetup])
+  }, [onRecordFinish, userAudioSetup])
 
   const stopRecording = useCallback(() => {
     // console.log(`stopRecording() at ${new Date().toLocaleTimeString()}`);
@@ -214,20 +217,6 @@ export const useAudioRecording = ({
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
   }, [isPlaying, isRecording])
-
-  // onFinish effect
-  useEffect(() => {
-    let ignore = false
-
-    if (!ignore && isStopped && recordedFile && onRecordFinish) {
-      // console.log("calling onRecordFinish");
-      onRecordFinish(recordedFile)
-    }
-
-    return () => {
-      ignore = true
-    }
-  }, [recordedFile, isStopped, onRecordFinish])
 
   const resetRecording = useCallback(() => {
     setRecordedFile(null)
