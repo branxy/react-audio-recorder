@@ -1,6 +1,6 @@
 import type { Stages } from "@/demo"
 import type { TUserAudioSetup } from "@/features/audio-recorder/context"
-import { getSupportedMIMETypes, selectMIMEType } from "@/lib/utils"
+import { getSupportedMIMEType } from "@/lib/utils"
 
 import { useEffect, useState } from "react"
 
@@ -37,8 +37,7 @@ export const useSetupAudioRecording = (stage: Stages) => {
     }
 
     const setupAudio = async () => {
-      const supportedMIMETypes = getSupportedMIMETypes()
-      const selectedMIMEType = selectMIMEType(supportedMIMETypes)
+      const selectedMIMEType = getSupportedMIMEType()
 
       const stream = await getLocalStream()
       setUserAudioSetup({

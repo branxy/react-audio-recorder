@@ -95,25 +95,23 @@ export const getAudioProgressPercent = ({
   return (Math.round(currentTime) / Math.round(recordedFileDuration ?? 1)) * 100
 }
 
-export const getSupportedMIMETypes = () => {
+export const getSupportedMIMEType = () => {
   const supportedMIMETypes: TSupportedMIMETypes = []
 
-  mimeTypes.reduce((result, type) => {
+  mimeTypes.reduce((supported, type) => {
     if (MediaRecorder.isTypeSupported(type)) {
-      result.push(type)
+      supported.push(type)
+    }
 
-      return result
-    } else return result
+    return supported
   }, supportedMIMETypes)
 
-  return supportedMIMETypes
-}
+  if (!supportedMIMETypes[0])
+    throw Error(
+      "Failed to select supported MIME type at getSupportedMIMETypes: no supported MIME types found."
+    )
 
-export const selectMIMEType = (supportedMIMETypes: TSupportedMIMETypes) => {
-  const selectedMIMEType = supportedMIMETypes.find((t) => t.startsWith("audio"))
-
-  if (!selectedMIMEType)
-    throw Error("Failed to select a MIME type: selectedMIMEType is undefined")
+  const selectedMIMEType = supportedMIMETypes[0]
 
   return selectedMIMEType
 }
