@@ -98,7 +98,12 @@ export const useAudioRecording = ({
     mediaRecorderRef.current = new MediaRecorder(userAudioSetup.mediaStream)
     let chunks: Blob[] = []
 
-    mediaRecorderRef.current.ondataavailable = (e) => chunks.push(e.data)
+    mediaRecorderRef.current.ondataavailable = (e) => {
+      // Skip empty chunks
+      if (!e.data.size) return
+
+      chunks.push(e.data)
+    }
 
     mediaRecorderRef.current.onstop = () => {
       // console.log(
