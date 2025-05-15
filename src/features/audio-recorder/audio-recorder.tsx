@@ -48,7 +48,6 @@ export function AudioRecorder({
           startPlaying={startPlaying}
           stopPlaying={stopPlaying}
           resetRecording={resetRecording}
-          // resetRecording={!autoRecord ? resetRecording : null}
         />
         <ProgressBar audioProgressPercent={audioProgressPercent} />
         <AudioTimer timeCount={timeCount} />
@@ -198,7 +197,7 @@ const AudioTimer = ({ timeCount }: Pick<AudioRecorderAPI, "timeCount">) => {
   if (!timeCount) return
   const { minutes, seconds } = timeCount
   return (
-    <p className="text-xl">
+    <p className="text-xl leading-0 pb-0.5">
       {minutes}:{seconds}
     </p>
   )

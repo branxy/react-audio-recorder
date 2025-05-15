@@ -71,7 +71,7 @@ export const useAudioRecording = ({
   // useEffect(() => {
   //   console.log({
   //     recorderState,
-  //     mediaStream,
+  //     userAudioSetup,
   //     mediaRecorderRef: mediaRecorderRef.current,
   //     recordedFile,
   //     audioElementRef: audioElementRef.current,
@@ -94,7 +94,6 @@ export const useAudioRecording = ({
         `Failed to start recording at startRecording: mediaStream is nullish.`
       )
 
-    // Always create a new MediaRecorder instance to prevent stale recorder state. New recording = new MediaRecorder.
     mediaRecorderRef.current = new MediaRecorder(userAudioSetup.mediaStream)
     let chunks: Blob[] = []
 
@@ -106,10 +105,6 @@ export const useAudioRecording = ({
     }
 
     mediaRecorderRef.current.onstop = () => {
-      // console.log(
-      //   `mediaRecorderRef.current.onstop() at ${new Date().toLocaleTimeString()}`,
-      // );
-
       if (!userAudioSetup)
         throw Error(
           "Failed to call mediaRecorderRef.current.onstop: selectedMIMEType is undefined."
@@ -128,7 +123,7 @@ export const useAudioRecording = ({
         type: userAudioSetup.selectedMIMEType,
       })
       chunks = []
-
+      
       const newAudioURL = URL.createObjectURL(file)
       setRecordedFile(file)
 
@@ -222,7 +217,6 @@ export const useAudioRecording = ({
     intervalRef.current = setInterval(() => setCurrentTime((t) => t + 1), 1000)
 
     return () => {
-      // console.log("interval cleanup run");
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
   }, [isPlaying, isRecording])

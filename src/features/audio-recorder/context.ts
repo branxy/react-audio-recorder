@@ -5,7 +5,7 @@ import { createContext, type Dispatch, type SetStateAction } from "react"
 export type TUserAudioSetup = {
   mediaStream: MediaStream
   selectedMIMEType: TSupportedMIMETypes[number]
-  selectedExtension: ReturnType<Mime["getExtension"]>
+  selectedExtension: NonNullable<ReturnType<Mime["getExtension"]>>
   setUserAudioSetup: Dispatch<SetStateAction<TUserAudioSetup>>
 } | null
 
