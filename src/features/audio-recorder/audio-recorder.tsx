@@ -48,7 +48,6 @@ export function AudioRecorder({
           startPlaying={startPlaying}
           stopPlaying={stopPlaying}
           resetRecording={resetRecording}
-          // resetRecording={!autoRecord ? resetRecording : null}
         />
         <ProgressBar audioProgressPercent={audioProgressPercent} />
         <AudioTimer timeCount={timeCount} />

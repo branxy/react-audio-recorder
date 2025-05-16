@@ -5,7 +5,7 @@ import { useSetupAudioRecording } from "@/lib/hooks/use-setup-audio-recording"
 
 import { UserAudioSetupContext } from "@/features/audio-recorder/context"
 
-import { use, useState, type ReactNode } from "react"
+import { useContext, useState, type ReactNode } from "react"
 
 export type Stages = "intro" | "recording" | "results"
 
@@ -31,7 +31,7 @@ const Intro = ({
 }: {
   setStage: React.Dispatch<React.SetStateAction<Stages>>
 }) => {
-  const userAudioSetup = use(UserAudioSetupContext)
+  const userAudioSetup = useContext(UserAudioSetupContext)
 
   return (
     <Button
@@ -49,7 +49,7 @@ const AudioRecordingStage = ({
 }: {
   setStage: React.Dispatch<React.SetStateAction<Stages>>
 }) => {
-  const userAudioSetup = use(UserAudioSetupContext)
+  const userAudioSetup = useContext(UserAudioSetupContext)
   const [isFinished, setIsFinished] = useState(false)
 
   if (!userAudioSetup || !userAudioSetup.mediaStream.active)
@@ -89,7 +89,7 @@ const ResultStage = ({
 }: {
   setStage: React.Dispatch<React.SetStateAction<Stages>>
 }) => {
-  const userAudioSetup = use(UserAudioSetupContext)
+  const userAudioSetup = useContext(UserAudioSetupContext)
 
   return (
     <>
