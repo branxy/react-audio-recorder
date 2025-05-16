@@ -2,7 +2,7 @@ import { Demo } from "@/demo"
 
 function App() {
   return (
-    <div className="min-h-screen flex flex-col items-center">
+    <div className="min-h-screen flex flex-col items-center pb-16">
       <h1 className="text-3xl font-oswald text-center font-extralight mt-48">
         React Audio Recorder
       </h1>
