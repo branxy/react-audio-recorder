@@ -8,8 +8,8 @@ export const Demo = () => {
   const userAudioSetup = useSetupAudioRecording()
 
   return (
-    <UserAudioSetupContext value={userAudioSetup}>
+    <UserAudioSetupContext.Provider value={userAudioSetup}>
       <AudioRecorder className="mt-12" />
-    </UserAudioSetupContext>
+    </UserAudioSetupContext.Provider>
   )
 }
