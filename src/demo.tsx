@@ -20,9 +20,9 @@ export const Demo = () => {
   }
 
   return (
-    <UserAudioSetupContext value={userAudioSetup}>
+    <UserAudioSetupContext.Provider value={userAudioSetup}>
       {ui[stage]}
-    </UserAudioSetupContext>
+    </UserAudioSetupContext.Provider>
   )
 }
 
