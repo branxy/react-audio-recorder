@@ -154,7 +154,8 @@ export const useAudioRecording = ({
     // because it creates a closure on currentTime with initial value 0. Has to stay in outside scope.
     setRecordedFileDuration(currentTime)
     setRecorderState({ status: "stopped" })
-  }, [currentTime])
+    userAudioSetup?.mediaStream.getTracks().forEach((t) => t.stop())
+  }, [currentTime, userAudioSetup?.mediaStream])
 
   // Auto-stop effect
   useEffect(() => {

@@ -38,7 +38,9 @@ export const useSetupAudioRecording = () => {
     return () => {
       ignore = true
     }
-  }, [userAudioSetup])
+
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [])
 
   return userAudioSetup
 }
