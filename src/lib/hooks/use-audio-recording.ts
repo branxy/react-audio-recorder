@@ -63,14 +63,15 @@ export const useAudioRecording = ({
   })
   const intervalRef = useRef<NodeJS.Timeout | null>(null)
 
-  const { isIdle, isRecording, isPlaying, isStopped } =
-    getAudioRecorderStatusBooleans(recorderState.status)
+  const { isIdle, isRecording, isPlaying } = getAudioRecorderStatusBooleans(
+    recorderState.status
+  )
 
   // Debug info:
   // useEffect(() => {
   //   console.log({
   //     recorderState,
-  //     mediaStream,
+  //     userAudioSetup,
   //     mediaRecorderRef: mediaRecorderRef.current,
   //     recordedFile,
   //     audioElementRef: audioElementRef.current,
@@ -93,18 +94,18 @@ export const useAudioRecording = ({
         `Failed to start recording at startRecording: mediaStream is nullish.`
       )
 
-    // Always create a new MediaRecorder instance to prevent stale recorder state. New recording = new MediaRecorder.
     mediaRecorderRef.current = new MediaRecorder(userAudioSetup.mediaStream)
     let chunks: Blob[] = []
 
-    mediaRecorderRef.current.ondataavailable = (e) => chunks.push(e.data)
+    mediaRecorderRef.current.ondataavailable = (e) => {
+      // Skip empty chunks
+      if (!e.data.size) return
+
+      chunks.push(e.data)
+    }
 
     mediaRecorderRef.current.onstop = () => {
-      // console.log(
-      //   `mediaRecorderRef.current.onstop() at ${new Date().toLocaleTimeString()}`,
-      // );
-
-      if (!userAudioSetup?.selectedMIMEType)
+      if (!userAudioSetup)
         throw Error(
           "Failed to call mediaRecorderRef.current.onstop: selectedMIMEType is undefined."
         )
@@ -114,7 +115,11 @@ export const useAudioRecording = ({
           "Failed to stop recording at mediaRecorderRef.current.onstop: mediaRecorderRef is nullish"
         )
 
-      const file = new File(chunks, crypto.randomUUID(), {
+      const fileName = `${crypto.randomUUID()}.${
+        userAudioSetup.selectedExtension
+      }`
+
+      const file = new File(chunks, fileName, {
         type: userAudioSetup.selectedMIMEType,
       })
       chunks = []
@@ -125,6 +130,8 @@ export const useAudioRecording = ({
       audioElementRef.current = new Audio(newAudioURL)
       const audio = audioElementRef.current as HTMLAudioElement
       audio.onerror = (e) => console.error(e)
+
+      if (onRecordFinish) onRecordFinish(file)
     }
 
     mediaRecorderRef.current.onerror = (e) => {
@@ -133,11 +140,9 @@ export const useAudioRecording = ({
 
     mediaRecorderRef.current.start()
     setRecorderState({ status: "recording" })
-  }, [userAudioSetup])
+  }, [onRecordFinish, userAudioSetup])
 
   const stopRecording = useCallback(() => {
-    // console.log(`stopRecording() at ${new Date().toLocaleTimeString()}`);
-
     if (!mediaRecorderRef.current)
       throw Error(
         "Failed to stop recording at stopRecording: mediaRecorderRef is nullish."
@@ -145,7 +150,7 @@ export const useAudioRecording = ({
 
     mediaRecorderRef.current.stop()
 
-    // Don't move setDuration inside mediaRecorder onstop callback
+    // Don't move setDuration inside mediaRecorder.onstop() callback
     // because it creates a closure on currentTime with initial value 0. Has to stay in outside scope.
     setRecordedFileDuration(currentTime)
     setRecorderState({ status: "stopped" })
@@ -153,23 +158,19 @@ export const useAudioRecording = ({
 
   // Auto-stop effect
   useEffect(() => {
-    // console.log("1. auto-stop effect run");
     const isRecordingTimeLimitReached = !!maxLength && currentTime >= maxLength
 
     if (isRecording && isRecordingTimeLimitReached) {
-      // console.log("calling stopRecording() from useEffect");
       stopRecording()
     }
   }, [currentTime, isRecording, maxLength, stopRecording])
 
   // Auto-record effect
   useEffect(() => {
-    // console.log("2. auto-record effect run");
     let ignore = false
     if (!ignore && isIdle && autoRecord) startRecording()
 
     return () => {
-      // console.log("auto-record cleanup run");
       ignore = true
     }
   }, [autoRecord, isIdle, startRecording])
@@ -203,31 +204,15 @@ export const useAudioRecording = ({
 
   // Interval effect
   useEffect(() => {
-    // console.log("3. interval effect run");
     if (!isRecording && !isPlaying) return
 
     if (intervalRef.current) clearInterval(intervalRef.current)
     intervalRef.current = setInterval(() => setCurrentTime((t) => t + 1), 1000)
 
     return () => {
-      // console.log("interval cleanup run");
       if (intervalRef.current) clearInterval(intervalRef.current)
     }
   }, [isPlaying, isRecording])
-
-  // onFinish effect
-  useEffect(() => {
-    let ignore = false
-
-    if (!ignore && isStopped && recordedFile && onRecordFinish) {
-      // console.log("calling onRecordFinish");
-      onRecordFinish(recordedFile)
-    }
-
-    return () => {
-      ignore = true
-    }
-  }, [recordedFile, isStopped, onRecordFinish])
 
   const resetRecording = useCallback(() => {
     setRecordedFile(null)

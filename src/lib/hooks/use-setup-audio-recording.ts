@@ -1,10 +1,11 @@
-import type { Stages } from "@/demo"
 import type { TUserAudioSetup } from "@/features/audio-recorder/context"
 import { getLocalStream, getSupportedMIMEType } from "@/lib/utils"
 
+import mime from "mime/lite"
+
 import { useEffect, useState } from "react"
 
-export const useSetupAudioRecording = (stage: Stages) => {
+export const useSetupAudioRecording = () => {
   const [userAudioSetup, setUserAudioSetup] = useState<TUserAudioSetup>(null)
 
   useEffect(() => {
@@ -13,22 +14,31 @@ export const useSetupAudioRecording = (stage: Stages) => {
     const setupAudio = async () => {
       const selectedMIMEType = getSupportedMIMEType()
 
-      const stream = await getLocalStream()
+      const selectedExtension = mime.getExtension(selectedMIMEType)
+
+      if (!selectedExtension)
+        throw Error(
+          "Failed to select a file extension at setupAudio: extension not found.",
+          { cause: selectedExtension }
+        )
+
+      const mediaStream = await getLocalStream()
       setUserAudioSetup({
-        mediaStream: stream,
+        mediaStream,
         selectedMIMEType,
+        selectedExtension,
         setUserAudioSetup,
       })
     }
 
-    if (!ignore && stage === "intro" && !userAudioSetup) {
+    if (!ignore && !userAudioSetup) {
       setupAudio()
     }
 
     return () => {
       ignore = true
     }
-  }, [stage, userAudioSetup])
+  }, [userAudioSetup])
 
   return userAudioSetup
 }
