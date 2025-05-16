@@ -7,7 +7,7 @@
 1. Копировать репозиторий
 
 ```bash
-npx degit branxy/react-audio-recorder
+npx degit branxy/react-audio-recorder myProjectFolderName
 ```
 
 2. Установить зависимости
